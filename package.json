@@ -1,7 +1,7 @@
 {
   "name": "react-use-drag-and-drop",
-  "version": "0.0.1",
-  "description": "Allow you drag and drop any html element.",
+  "version": "0.0.2",
+  "description": "Allow you drag and drop any html or svg element.",
   "license": "MIT",
   "author": "lvsouza",
   "main": "dist/index.js",

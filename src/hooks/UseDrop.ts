@@ -15,7 +15,7 @@ type DropResult = [{
 }]
 type DropProps<T> = {
   id: string;
-  element: React.RefObject<HTMLElement | Document | null>;
+  element: React.RefObject<HTMLElement | SVGElement | Document | null>;
   drop?: (data: T | undefined, monitor: TMonitor) => void;
   leave?: (data: T | undefined, monitor: TMonitor) => void;
   hover?: (data: T | undefined, monitor: TMonitor) => void;
