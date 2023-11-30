@@ -14,6 +14,11 @@ type DropResult = [{
   isDraggingOverCurrent: boolean;
 }]
 type DropProps<T> = {
+  /**
+   * Use to unique identify this droppable element
+   *
+   * Helps to verify if the current drop belongs to this droppable area
+   */
   id: string;
   element: React.RefObject<HTMLElement | SVGElement | Document | null>;
   drop?: (data: T | undefined, monitor: TMonitor) => void;
