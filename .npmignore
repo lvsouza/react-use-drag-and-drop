@@ -1,4 +1,8 @@
-/example
-/docs
 /.vscode
+/docs
+/example
 /node_modules
+/src
+.editorconfig
+tsconfig.json
+vite.config.ts
