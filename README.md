@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/lvsouza/react-use-drag-and-drop/master/src/assets/logo.png" width="150" alt="react-use-drag-and-drop" />
+  <img src="./docs/logo.png" width="150" alt="react-use-drag-and-drop" />
   <h1 align="center">react-use-drag-and-drop</h1>
 </p>
 

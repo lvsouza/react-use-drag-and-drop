@@ -1,36 +1,32 @@
 {
   "compilerOptions": {
-    "target": "ES6",
-    "module": "esnext",
-    "lib": [ "esnext", "dom"],
-    "moduleResolution": "node",
-    "declaration": true,
-    "sourceMap": true,
-    "esModuleInterop": true,
-    "noImplicitReturns": true,
-    "noImplicitThis": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
-    "suppressImplicitAnyIndexErrors": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "allowSyntheticDefaultImports": true,
-    "allowJs": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": false,
-    "outDir": "./dist"
+    "target": "ES5", // Specifies the JavaScript version to target when transpiling code.
+    "useDefineForClassFields": true, // Enables the use of 'define' for class fields.
+    "lib": ["ES2021", "DOM", "DOM.Iterable"], // Specifies the libraries available for the code.
+    "module": "ESNext", // Defines the module system to use for code generation.
+    "skipLibCheck": true, // Skips type checking of declaration files.
+
+    /* Bundler mode */
+    "moduleResolution": "bundler", // Specifies how modules are resolved when bundling.
+    "allowImportingTsExtensions": true, // Allows importing TypeScript files with extensions.
+    "resolveJsonModule": true, // Enables importing JSON modules.
+    "isolatedModules": true, // Ensures each file is treated as a separate module.
+    "noEmit": true, // Prevents TypeScript from emitting output files.
+    "jsx": "react-jsx", // Configures JSX support for React.
+
+    /* Linting */
+    "strict": true, // Enables strict type checking.
+    "noUnusedLocals": true, // Flags unused local variables.
+    "noUnusedParameters": true, // Flags unused function parameters.
+    "noFallthroughCasesInSwitch": true, // Requires handling all cases in a switch statement.
+    "declaration": true, // Generates declaration files for TypeScript.
   },
   "include": [
-    "src/**/*"
+    "src"
   ],
   "exclude": [
-    "src/**/*.test.ts",
-    "node_modules",
-    "dist",
-    "example"
-  ],
+    "example",
+    "docs",
+    ".vscode",
+  ]
 }

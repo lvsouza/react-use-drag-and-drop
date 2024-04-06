@@ -1,62 +1,38 @@
 {
   "name": "react-use-drag-and-drop",
-  "version": "0.0.2",
+  "version": "1.0.0",
   "description": "Allow you drag and drop any html or svg element.",
   "license": "MIT",
   "author": "lvsouza",
-  "main": "dist/index.js",
-  "source": "src/index.ts",
+  "type": "module",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.es.js",
   "types": "dist/index.d.ts",
-  "repository": "git://github.com/lvsouza/react-use-drag-and-drop.git",
-  "engines": {
-    "node": ">=14"
-  },
+  "files": [
+    "/dist"
+  ],
   "scripts": {
     "test": "jest",
-    "docs": "cd docs && yarn start",
-    "example": "cd example/ && yarn start",
-    "prebuild": "del-cli example/node_modules/react-use-drag-and-drop/**/*",
-    "build": "tsc",
-    "postbuild": "cpy '**/*' '../example/node_modules/react-use-drag-and-drop/' --cwd=dist/ --parents"
+    "dev": "cd example && vite --port 3000 --force",
+    "build": "tsc && vite build",
+    "postinstall": "cd example && yarn"
   },
   "dependencies": {
-    "react-observing": "^2.5.14",
-    "uuid": "^9.0.0"
-  },
-  "devDependencies": {
-    "@types/jest": "^29.2.2",
-    "@types/node": "^18.11.9",
-    "@types/react": "^18.0.25",
-    "@types/uuid": "^8.3.4",
-    "cpy-cli": "^3.1.1",
-    "del-cli": "^4.0.1",
-    "jest": "^29.3.1",
-    "ts-jest": "^29.0.3",
-    "ts-node": "^10.9.1",
-    "react": "^18.2.0",
-    "typescript": "^4.8.4"
   },
   "peerDependencies": {
-    "react": "^18.2.0"
+    "react": "^18.2.0",
+    "react-observing": "^2.6.16",
+    "uuid": "^9.0.1"
   },
-  "files": [
-    "dist"
-  ],
-  "keywords": [
-    "react",
-    "reactjs",
-    "state",
-    "recoil",
-    "recoiljs",
-    "observers",
-    "typescript",
-    "listeners",
-    "listen",
-    "observe",
-    "observing",
-    "rxjs",
-    "react rxjs",
-    "react subscribe",
-    "react observing"
-  ]
+  "devDependencies": {
+    "@types/node": "^20.12.5",
+    "@types/react": "^18.2.74",
+    "@types/uuid": "^9.0.8",
+    "react": "^18.2.0",
+    "react-observing": "^2.6.16",
+    "typescript": "^5.4.4",
+    "uuid": "^9.0.1",
+    "vite": "^5.2.8",
+    "vite-plugin-dts": "^3.8.1"
+  }
 }
