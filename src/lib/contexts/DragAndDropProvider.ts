@@ -1,5 +1,8 @@
-import React, { createContext, useCallback, useContext, useRef } from "react";
+import React, { createContext, useCallback, useContext, useMemo, useRef } from "react";
 import { IObservable, ISubscription, observe } from "react-observing";
+
+
+const emptyContext = {} as IDragAndDropContextData;
 
 
 interface IDragAndDropContextData {
@@ -9,7 +12,7 @@ interface IDragAndDropContextData {
   setData: <T = any>(newData: TStoredData<T>) => void;
   draggingIdSubscriber: (callback: (val: string | undefined) => void) => ISubscription;
 }
-const DragAndDropContext = createContext({} as IDragAndDropContextData);
+const DragAndDropContext = createContext(emptyContext);
 
 export const useDragAndDropContext = () => useContext(DragAndDropContext);
 
@@ -21,6 +24,9 @@ interface IDragAndDropProviderProps {
   children: React.ReactNode;
 }
 export const DragAndDropProvider = ({ children }: IDragAndDropProviderProps) => {
+  const nestedContext = useContext(DragAndDropContext);
+
+
   const dragStore = useRef<TStoredData<any>>({ data: undefined, draggingId: undefined });
   const dragStoreId = useRef<IObservable<string | undefined>>(observe(undefined));
 
@@ -50,9 +56,14 @@ export const DragAndDropProvider = ({ children }: IDragAndDropProviderProps) => 
   }, []);
 
 
-  return React.createElement(
-    DragAndDropContext.Provider,
-    { value: { getData, setData, clearData, draggingIdSubscriber, updateDataOnly } },
-    children
-  );
+  const contextValue = useMemo(() => {
+    const currentContextValue = { getData, setData, clearData, draggingIdSubscriber, updateDataOnly };
+
+    if (nestedContext === emptyContext) return currentContextValue;
+
+    return nestedContext;
+  }, [nestedContext, getData, setData, clearData, draggingIdSubscriber, updateDataOnly]);
+
+
+  return React.createElement(DragAndDropContext.Provider, { value: contextValue }, children);
 };

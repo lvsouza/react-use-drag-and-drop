@@ -19,17 +19,98 @@ or
 yarn add react-use-drag-and-drop
 ```
 
-## See our full documentation
+## Usage
 
-* [Overview](https://react-use-drag-and-drop.web.app/)
-* [Installation](https://react-use-drag-and-drop.web.app/installation)
-* [Quick start](https://react-use-drag-and-drop.web.app/quick-start)
-* Providers
-  * [DragAndDropProvider](https://react-use-drag-and-drop.web.app/providers/drag-and-drop-provider)
-* Hooks
-  * [useDrag](https://react-use-drag-and-drop.web.app/hooks/use-drag)
-  * [useDrop](https://react-use-drag-and-drop.web.app/hooks/use-drop)
-* Typescript
-  * [TMonitor](https://react-use-drag-and-drop.web.app/typescript/i-observable)
-* More
-  * [Roadmap](https://react-use-drag-and-drop.web.app/more/roadmap)
+You need provide the drag and drop context
+
+```ts
+import { DragAndDropProvider } from 'react-use-drag-and-drop';
+```
+
+
+```html
+<DragAndDropProvider>
+  ...
+</DragAndDropProvider>
+
+```
+
+Now in your component you can use the hooks, first create your draggable component
+
+
+```ts
+import { useDrag } from 'react-use-drag-and-drop';
+
+
+const MyComponentDraggable = () => {
+  const htmlRef = useRef(null);
+
+  //...
+
+  const { isDragging, preview } = useDrag({
+    id,
+    canDrag: true,
+    data: { counter },
+    element: elementToDragRef,
+    end: (props) => console.log('end', props),
+    start: (props) => console.log('start', props),
+  }, [counter, id]);
+
+  //...
+
+
+  return <button ref={htmlRef}>Drag button</button>
+}
+```
+
+Now you ca create your droppable component 
+
+```ts
+import { useDrop } from 'react-use-drag-and-drop';
+
+
+const MyComponentDroppable = () => {
+  const htmlRef = useRef(null);
+
+  //...
+
+  const [{ isDraggingOver, isDraggingOverCurrent }] = useDrop({
+    id,
+    element: elementToDropRef,
+    drop: (data, monitor) => console.log('drop', data, monitor),
+    hover: (data, monitor) => console.log('hover', data, monitor),
+    leave: (data, monitor) => console.log('leave', data, monitor),
+  }, [id]);
+
+  //...
+
+
+  return <div ref={htmlRef}>Drop area div</div>
+}
+```
+
+## Contribute
+
+1. Clone this repository
+1. Prefer to use yarn for dependency installation
+1. Install the dependencies
+
+    ```
+    yarn install
+    ```
+1. Run the example in local host
+
+    ```
+    yarn dev
+    ```
+1. Change `package.json` version
+1. Build the package
+
+    ```
+    yarn build
+    ```
+1. Publish the new version
+
+    ```
+    npm publish
+    ```
