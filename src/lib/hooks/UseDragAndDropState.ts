@@ -1,26 +1,39 @@
 import { useCallback } from "react"
 
-import { useDragAndDropContext } from "../contexts"
-import { TMonitor } from './UseDrop';
+import { TDragMonitor, TDropMonitor, useDragAndDropContext } from "../contexts"
 
 
 type TUnsubscribe = () => void;
 
 export type TDragAndDropState = {
   getMonitor(): {
-    subscribeToStateChange(callback: (val: TMonitor | null) => void): TUnsubscribe
+    subscribeToStateChange(callback: (val: TDropMonitor | TDragMonitor | null) => void): TUnsubscribe;
+  };
+  getDragging(): {
+    subscribeToStateChange(callback: (val: boolean) => void): TUnsubscribe;
   };
 }
 
 export function useDragAndDropState(): TDragAndDropState {
-  const { getMonitor } = useDragAndDropContext();
+  const { getMonitor, draggingIdSubscriber } = useDragAndDropContext();
 
 
   const handleGetMonitor = useCallback(() => {
     const monitor = getMonitor();
 
-    const subscribe = (callback: (val: TMonitor | null) => void) => {
+    const subscribe = (callback: (val: TDropMonitor | TDragMonitor | null) => void) => {
       return monitor.subscribe(callback).unsubscribe
+    }
+
+    return {
+      subscribeToStateChange: subscribe,
+    };
+  }, [getMonitor]);
+
+  const handleGetDragging = useCallback(() => {
+
+    const subscribe = (callback: (val: boolean) => void) => {
+      return draggingIdSubscriber(val => callback(!!val)).unsubscribe
     }
 
     return {
@@ -30,6 +43,7 @@ export function useDragAndDropState(): TDragAndDropState {
 
 
   return {
-    getMonitor: handleGetMonitor
+    getMonitor: handleGetMonitor,
+    getDragging: handleGetDragging,
   };
 }

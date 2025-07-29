@@ -1,16 +1,28 @@
-import React, { createContext, useCallback, useContext, useMemo, useRef } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef } from "react";
 import { IObservable, ISubscription, observe } from "react-observing";
-import { TMonitor } from '../hooks/UseDrop';
 
 
 const emptyContext = {} as IDragAndDropContextData;
 
+export type TDropMonitor = {
+  x: number;
+  y: number;
+  droppableId: string;
+  draggingId: string | undefined;
+}
+
+export type TDragMonitor = {
+  x: number;
+  y: number;
+  draggingId: string;
+  droppableId: string | undefined;
+}
 
 interface IDragAndDropContextData {
   clearData: () => void;
   updateDataOnly: <T = any>(newData: T) => void;
-  getMonitor: () => IObservable<TMonitor | null>;
-  setMonitor: (monitor: TMonitor | null) => void;
+  getMonitor: () => IObservable<TDropMonitor | TDragMonitor | null>;
+  setMonitor: (monitor: TDropMonitor | TDragMonitor | null) => void;
   getData: <T = any>() => TStoredData<T> | undefined;
   setData: <T = any>(newData: TStoredData<T>) => void;
   draggingIdSubscriber: (callback: (val: string | undefined) => void) => ISubscription;
@@ -30,9 +42,29 @@ export const DragAndDropProvider = ({ children }: IDragAndDropProviderProps) => 
   const nestedContext = useContext(DragAndDropContext);
 
 
-  const monitorRef = useRef<IObservable<TMonitor | null>>(observe(null));
+  const monitorRef = useRef<IObservable<TDropMonitor | TDragMonitor | null>>(observe(null));
   const dragStore = useRef<TStoredData<any>>({ data: undefined, draggingId: undefined });
   const dragStoreId = useRef<IObservable<string | undefined>>(observe(undefined));
+
+
+  useEffect(() => {
+    const dragEvent = (e: DragEvent) => {
+      if (!dragStore.current.draggingId) return;
+
+      monitorRef.current.value = {
+        x: e.clientX,
+        y: e.clientY,
+        droppableId: undefined,
+        draggingId: dragStore.current.draggingId,
+      };
+    };
+
+    document.addEventListener('dragover', dragEvent);
+
+    return () => {
+      document.removeEventListener('dragover', dragEvent);
+    };
+  }, []);
 
 
   const draggingIdSubscriber = useCallback((callback: (val: string | undefined) => void) => {
@@ -50,6 +82,7 @@ export const DragAndDropProvider = ({ children }: IDragAndDropProviderProps) => 
   }, []);
 
   const clearData = useCallback(() => {
+    monitorRef.current.value = null;
     dragStore.current.data = undefined;
     dragStoreId.current.value = undefined;
     dragStore.current.draggingId = undefined;
@@ -59,7 +92,7 @@ export const DragAndDropProvider = ({ children }: IDragAndDropProviderProps) => 
     return monitorRef.current;
   }, []);
 
-  const setMonitor = useCallback((monitor: TMonitor | null) => {
+  const setMonitor = useCallback((monitor: TDropMonitor | TDragMonitor | null) => {
     monitorRef.current.value = monitor;
   }, []);
 

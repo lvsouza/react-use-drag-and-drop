@@ -1,14 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react"
 
-import { useDragAndDropContext } from "./../contexts"
+import { TDropMonitor, useDragAndDropContext } from "./../contexts"
 
 
-export type TMonitor = {
-  x: number;
-  y: number;
-  droppableId: string;
-  draggingId: string | undefined;
-}
 type DropResult = [{
   isDraggingOver: boolean;
   isDraggingOverCurrent: boolean;
@@ -21,9 +15,9 @@ type DropProps<T> = {
    */
   id: string;
   element: React.RefObject<HTMLElement | SVGElement | Document | null>;
-  drop?: (data: T | undefined, monitor: TMonitor) => void;
-  leave?: (data: T | undefined, monitor: TMonitor) => void;
-  hover?: (data: T | undefined, monitor: TMonitor) => void;
+  drop?: (data: T | undefined, monitor: TDropMonitor) => void;
+  leave?: (data: T | undefined, monitor: TDropMonitor) => void;
+  hover?: (data: T | undefined, monitor: TDropMonitor) => void;
 }
 type TUseDropProps = <T = any>(props: DropProps<T>, deps?: ReadonlyArray<any>) => DropResult
 
