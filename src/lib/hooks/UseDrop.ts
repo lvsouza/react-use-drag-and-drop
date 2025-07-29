@@ -28,7 +28,7 @@ type DropProps<T> = {
 type TUseDropProps = <T = any>(props: DropProps<T>, deps?: ReadonlyArray<any>) => DropResult
 
 export const useDrop: TUseDropProps = ({ id, element, hover, leave, drop }, deps = []) => {
-  const { getData } = useDragAndDropContext();
+  const { getData, setMonitor } = useDragAndDropContext();
 
   const [isDraggingOverCurrent, setIsDraggingOverCurrent] = useState(false);
   const [isDraggingOver, setIsDraggingOver] = useState(false);
@@ -43,21 +43,27 @@ export const useDrop: TUseDropProps = ({ id, element, hover, leave, drop }, deps
 
     const draggedData = getData<any>();
     if (draggedData) {
-      hover && hover(draggedData.data, {
+      const monitor = {
         x: e.clientX,
         y: e.clientY,
         draggingId: draggedData.draggingId,
         droppableId: (e.target as any)?.dataset.droppableId,
-      });
+      };
+
+      setMonitor(monitor)
+      hover && hover(draggedData.data, monitor);
     } else {
-      hover && hover(undefined, {
+      const monitor = {
         x: e.clientX,
         y: e.clientY,
         draggingId: undefined,
         droppableId: (e.target as any)?.dataset.droppableId,
-      });
+      };
+
+      setMonitor(monitor)
+      hover && hover(undefined, monitor);
     }
-  }, [getData, hover, id, ...deps]);
+  }, [getData, setMonitor, hover, id, ...deps]);
 
   const handleDrop = useCallback((e: DragEvent) => {
     e.stopPropagation();
@@ -68,21 +74,25 @@ export const useDrop: TUseDropProps = ({ id, element, hover, leave, drop }, deps
 
     const draggedData = getData<any>();
     if (draggedData) {
-      drop && drop(draggedData.data, {
+      const monitor = {
         x: e.clientX,
         y: e.clientY,
         draggingId: draggedData.draggingId,
         droppableId: (e.target as any)?.dataset.droppableId,
-      });
+      };
+      setMonitor(monitor);
+      drop && drop(draggedData.data, monitor);
     } else {
-      drop && drop(undefined, {
+      const monitor = {
         x: e.clientX,
         y: e.clientY,
         draggingId: undefined,
         droppableId: (e.target as any)?.dataset.droppableId,
-      });
+      };
+      setMonitor(monitor);
+      drop && drop(undefined, monitor);
     }
-  }, [getData, drop]);
+  }, [getData, setMonitor, drop]);
 
   const handleDragLeave = useCallback((e: DragEvent) => {
     setIsDraggingOver(false);
@@ -90,21 +100,27 @@ export const useDrop: TUseDropProps = ({ id, element, hover, leave, drop }, deps
 
     const draggedData = getData();
     if (draggedData) {
-      setTimeout(() => leave && leave(draggedData.data, {
-        x: e.clientX,
-        y: e.clientY,
-        draggingId: draggedData.draggingId,
-        droppableId: (e.target as any)?.dataset.droppableId,
-      }), 0);
+      setTimeout(() => {
+        const monitor = {
+          x: e.clientX,
+          y: e.clientY,
+          draggingId: draggedData.draggingId,
+          droppableId: (e.target as any)?.dataset.droppableId,
+        };
+        setMonitor(monitor);
+        leave && leave(draggedData.data, monitor);
+      }, 0);
     } else {
-      leave && leave(undefined, {
+      const monitor = {
         x: e.clientX,
         y: e.clientY,
         draggingId: undefined,
         droppableId: (e.target as any)?.dataset.droppableId,
-      });
+      };
+      setMonitor(monitor);
+      leave && leave(undefined, monitor);
     }
-  }, [getData, leave]);
+  }, [getData, setMonitor, leave]);
 
 
   useEffect(() => {

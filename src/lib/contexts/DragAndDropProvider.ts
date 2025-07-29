@@ -1,5 +1,6 @@
 import React, { createContext, useCallback, useContext, useMemo, useRef } from "react";
 import { IObservable, ISubscription, observe } from "react-observing";
+import { TMonitor } from '../hooks/UseDrop';
 
 
 const emptyContext = {} as IDragAndDropContextData;
@@ -8,6 +9,8 @@ const emptyContext = {} as IDragAndDropContextData;
 interface IDragAndDropContextData {
   clearData: () => void;
   updateDataOnly: <T = any>(newData: T) => void;
+  getMonitor: () => IObservable<TMonitor | null>;
+  setMonitor: (monitor: TMonitor | null) => void;
   getData: <T = any>() => TStoredData<T> | undefined;
   setData: <T = any>(newData: TStoredData<T>) => void;
   draggingIdSubscriber: (callback: (val: string | undefined) => void) => ISubscription;
@@ -16,7 +19,7 @@ const DragAndDropContext = createContext(emptyContext);
 
 export const useDragAndDropContext = () => useContext(DragAndDropContext);
 
-type TStoredData<T> = {
+export type TStoredData<T> = {
   data: T;
   draggingId: string | undefined;
 }
@@ -27,6 +30,7 @@ export const DragAndDropProvider = ({ children }: IDragAndDropProviderProps) => 
   const nestedContext = useContext(DragAndDropContext);
 
 
+  const monitorRef = useRef<IObservable<TMonitor | null>>(observe(null));
   const dragStore = useRef<TStoredData<any>>({ data: undefined, draggingId: undefined });
   const dragStoreId = useRef<IObservable<string | undefined>>(observe(undefined));
 
@@ -51,18 +55,26 @@ export const DragAndDropProvider = ({ children }: IDragAndDropProviderProps) => 
     dragStore.current.draggingId = undefined;
   }, []);
 
+  const getMonitor = useCallback(() => {
+    return monitorRef.current;
+  }, []);
+
+  const setMonitor = useCallback((monitor: TMonitor | null) => {
+    monitorRef.current.value = monitor;
+  }, []);
+
   const updateDataOnly = useCallback((newData: any) => {
     dragStore.current.data = newData;
   }, []);
 
 
   const contextValue = useMemo(() => {
-    const currentContextValue = { getData, setData, clearData, draggingIdSubscriber, updateDataOnly };
+    const currentContextValue = { getData, setData, clearData, draggingIdSubscriber, updateDataOnly, getMonitor, setMonitor };
 
     if (nestedContext === emptyContext) return currentContextValue;
 
     return nestedContext;
-  }, [nestedContext, getData, setData, clearData, draggingIdSubscriber, updateDataOnly]);
+  }, [nestedContext, getData, setData, clearData, draggingIdSubscriber, updateDataOnly, getMonitor, setMonitor]);
 
 
   return React.createElement(DragAndDropContext.Provider, { value: contextValue }, children);
