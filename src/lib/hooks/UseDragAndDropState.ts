@@ -22,7 +22,7 @@ export function useDragAndDropState(): TDragAndDropState {
     const monitor = getMonitor();
 
     const subscribe = (callback: (val: TDropMonitor | TDragMonitor | null) => void) => {
-      return monitor.subscribe(callback).unsubscribe
+      return monitor.subscribe(callback)
     }
 
     return {
@@ -33,7 +33,7 @@ export function useDragAndDropState(): TDragAndDropState {
   const handleGetDragging = useCallback(() => {
 
     const subscribe = (callback: (val: boolean) => void) => {
-      return draggingIdSubscriber(val => callback(!!val)).unsubscribe
+      return draggingIdSubscriber(val => callback(!!val))
     }
 
     return {

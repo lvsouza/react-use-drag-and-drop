@@ -1,6 +1,49 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef } from "react";
-import { IObservable, ISubscription, observe } from "react-observing";
 
+/**
+ * Interface that defines an observable value
+ *
+ * @param T Observable value type
+ */
+export interface IObservable<T> {
+  /**
+   * Static value.
+   * When making an assignment on this property, all
+   * subscribers to that value will hear
+   */
+  value: T;
+  /**
+   * Enables enrollment in value changes
+   * @param callback Function performed when there is a change in the observed value
+   */
+  subscribe(callback: (val: T) => void): () => void;
+}
+
+function observe<T>(initialValue: T): IObservable<T> {
+  const listeners = new Set<(value: T) => void>([]);
+
+  const setCurrentValue = (newValue: T) => {
+    initialValue = newValue;
+    listeners.forEach((listener) => listener(newValue));
+  };
+
+  const getCurrentValue = () => initialValue;
+
+  const subscribe = (fn: (val: T) => void) => {
+    listeners.add(fn);
+    return () => listeners.delete(fn);
+  };
+
+  return {
+    subscribe,
+    get value() {
+      return getCurrentValue();
+    },
+    set value(value: T) {
+      setCurrentValue(value);
+    }
+  };
+}
 
 const emptyContext = {} as IDragAndDropContextData;
 
@@ -25,7 +68,7 @@ interface IDragAndDropContextData {
   setMonitor: (monitor: TDropMonitor | TDragMonitor | null) => void;
   getData: <T = any>() => TStoredData<T> | undefined;
   setData: <T = any>(newData: TStoredData<T>) => void;
-  draggingIdSubscriber: (callback: (val: string | undefined) => void) => ISubscription;
+  draggingIdSubscriber: (callback: (val: string | undefined) => void) => () => void;
 }
 const DragAndDropContext = createContext(emptyContext);
 

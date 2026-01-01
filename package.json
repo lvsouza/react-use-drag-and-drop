@@ -1,6 +1,6 @@
 {
   "name": "react-use-drag-and-drop",
-  "version": "1.2.1",
+  "version": "2.0.0",
   "description": "Allow you drag and drop any html or svg element.",
   "license": "MIT",
   "author": "lvsouza",
@@ -19,16 +19,12 @@
   },
   "dependencies": {},
   "peerDependencies": {
-    "react": "^18.2.0",
-    "react-observing": "^2.6.16",
-    "uuid": "^9.0.1"
+    "react": "^18.2.0"
   },
   "devDependencies": {
     "@types/node": "^20.12.5",
     "@types/react": "^18.2.74",
-    "@types/uuid": "^9.0.8",
     "react": "^18.2.0",
-    "react-observing": "^2.6.16",
     "typescript": "^5.4.4",
     "uuid": "^9.0.1",
     "vite": "^5.2.8",

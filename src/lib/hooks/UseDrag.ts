@@ -39,7 +39,7 @@ export const useDrag: TUseDragProps = ({ element, data, id, canDrag = true, star
       }
     });
 
-    return draggingIdSubscription.unsubscribe;
+    return draggingIdSubscription;
   }, [draggingIdSubscriber, id, isDragging]);
 
   // Registre drag handle

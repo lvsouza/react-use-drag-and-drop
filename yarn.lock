@@ -322,11 +322,6 @@
     "@types/prop-types" "*"
     csstype "^3.0.2"
 
-"@types/uuid@^9.0.8":
-  version "9.0.8"
-  resolved "https://registry.yarnpkg.com/@types/uuid/-/uuid-9.0.8.tgz#7545ba4fc3c003d6c756f651f3bf163d8f0f29ba"
-  integrity sha512-jg+97EGIcY9AGHJJRaaPVgetKDsrTgbRjQ5Msgjh/DQKEFl0DtyRr/VCOyD1T2R1MNeWPK/u7JoGhlDZnKBAfA==
-
 "@volar/language-core@1.11.1", "@volar/language-core@~1.11.1":
   version "1.11.1"
   resolved "https://registry.yarnpkg.com/@volar/language-core/-/language-core-1.11.1.tgz#ecdf12ea8dc35fb8549e517991abcbf449a5ad4f"
@@ -684,13 +679,6 @@ punycode@^2.1.0:
   version "2.3.1"
   resolved "https://registry.yarnpkg.com/punycode/-/punycode-2.3.1.tgz#027422e2faec0b25e1549c3e1bd8309b9133b6e5"
   integrity sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==
-
-react-observing@^2.6.16:
-  version "2.6.16"
-  resolved "https://registry.yarnpkg.com/react-observing/-/react-observing-2.6.16.tgz#2393c506e9665456dffebd724523344851f01a72"
-  integrity sha512-7mve2xldsllE6HuyDgHONScKHUtb9zGZl/FJRyPnZHBwRR87BLtPWOFNlSt1GdHRvAPVqocj+D7CAiojggRQQA==
-  dependencies:
-    uuid "^9.0.1"
 
 react@^18.2.0:
   version "18.2.0"
