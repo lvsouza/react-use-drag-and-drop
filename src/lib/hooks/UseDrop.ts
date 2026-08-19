@@ -69,7 +69,7 @@ type TUseDropProps = <T = any>(props: DropProps<T>, deps?: ReadonlyArray<any>) =
  * Hook to transform an element into a droppable target. It manages event listeners and provides reactive state for drag-over visual cues.
  */
 export const useDrop: TUseDropProps = ({ id, element, hover, leave, drop }, deps = []) => {
-  const { getData, setMonitor } = useDragAndDropContext();
+  const { getData, setMonitor, draggingIdSubscriber } = useDragAndDropContext();
 
   const [isDraggingOverCurrent, setIsDraggingOverCurrent] = useState(false);
   const [isDraggingOver, setIsDraggingOver] = useState(false);
@@ -79,6 +79,21 @@ export const useDrop: TUseDropProps = ({ id, element, hover, leave, drop }, deps
   useEffect(() => {
     callbacks.current = { hover, leave, drop };
   }, [hover, leave, drop, ...deps]);
+
+  /**
+   * Resets the local hover state when a drag operation ends for any reason
+   * (successful drop handled elsewhere, dropped outside, or drag cancelled via Esc).
+   * Without this, a drop zone could remain stuck with isDraggingOver=true when the
+   * drag is cancelled before firing dragleave or drop.
+   */
+  useEffect(() => {
+    const unsubscribe = draggingIdSubscriber(newId => {
+      if (newId !== undefined) return;
+      setIsDraggingOver(false);
+      setIsDraggingOverCurrent(false);
+    });
+    return unsubscribe;
+  }, [draggingIdSubscriber]);
 
   useEffect(() => {
     const targetNode = element.current && element.current.nodeType === Node.DOCUMENT_NODE
@@ -133,6 +148,13 @@ export const useDrop: TUseDropProps = ({ id, element, hover, leave, drop }, deps
     };
 
     const handleDragLeave = (e: DragEvent) => {
+      // dragleave also fires when moving onto a child of this drop zone.
+      // If the related target is still inside this node, it is not a real leave.
+      const relatedTarget = e.relatedTarget as Node | null;
+      if (relatedTarget && targetNode !== relatedTarget && targetNode.contains(relatedTarget)) {
+        return;
+      }
+
       setIsDraggingOver(false);
       setIsDraggingOverCurrent(false);
 
@@ -140,9 +162,8 @@ export const useDrop: TUseDropProps = ({ id, element, hover, leave, drop }, deps
       setMonitor(monitor);
 
       if (callbacks.current.leave) {
-        setTimeout(() => {
-          callbacks.current.leave?.(getData()?.data, monitor);
-        }, 0);
+        const data = getData()?.data;
+        callbacks.current.leave(data, monitor);
       }
     };
 

@@ -192,8 +192,14 @@ const [{ isDraggingOver, isDraggingOverCurrent }] = useDrop(options, deps);
 
 | Property | Type | Description |
 | --- | --- | --- |
-| `isDraggingOver` | `boolean` | `true` if an item is hovering over this zone or its children. |
-| `isDraggingOverCurrent` | `boolean` | `true` ONLY if the item is hovering strictly over this zone (not children). |
+| `isDraggingOver` | `boolean` | `true` if an item is hovering over this zone (or one of its descendant drop zones). |
+| `isDraggingOverCurrent` | `boolean` | `true` ONLY if the item is hovering strictly over this zone (not a child). |
+
+> **Nested drop zones:** only the **innermost** drop zone under the cursor responds.
+> When a draggable item is over a child drop zone, the event is stopped at that child,
+> so parent zones do **not** fire `dragover`, `hover`, `drop` or `leave` for that child,
+> and their `isDraggingOver` stays `false`. Use `isDraggingOverCurrent` to distinguish
+> "on this exact zone" from "on one of my children".
 
 ---
 

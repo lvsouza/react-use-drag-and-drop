@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import { useDragAndDropContext } from "./../contexts/DragAndDropProvider";
 
@@ -84,6 +84,12 @@ type DragProps<T> = {
 type TUseDragProps = <T = any>(props: DragProps<T>, deps?: ReadonlyArray<any>) => DragResult;
 
 /**
+ * Tracks the set of draggable ids currently registered so we can warn
+ * about duplicate ids being used by more than one drag source.
+ */
+const registeredDragIds = new Set<string>();
+
+/**
  * Hook to transform a DOM element into a draggable source.
  * 
  * It automatically handles the native HTML5 Drag and Drop events, synchronizes the dragged data with the global context, and provides a reactive state to track the dragging status of the element.
@@ -108,6 +114,17 @@ export const useDrag: TUseDragProps = ({ element, data, id, canDrag = true, star
   const { setData, clearData, draggingIdSubscriber, updateDataOnly } = useDragAndDropContext();
   const [isDragging, setIsDragging] = useState(false);
 
+  /**
+   * Keeps the actual DOM node that should be draggable in state.
+   * Because `element` is a stable ref object, tracking `element.current` here
+   * lets us re-anchor listeners and the `draggable` attribute whenever React
+   * swaps the underlying node (e.g. keyed list reordering).
+   */
+  const [node, setNode] = useState<HTMLElement | null>(() => element.current ?? null);
+  useLayoutEffect(() => {
+    setNode(element.current ?? null);
+  }, [element]);
+
   const latestData = useRef(data);
   const callbacks = useRef({ start, end });
 
@@ -122,7 +139,6 @@ export const useDrag: TUseDragProps = ({ element, data, id, canDrag = true, star
     callbacks.current = { start, end };
   }, [data, start, end, ...deps]);
 
-
   useEffect(() => {
     const draggingIdSubscription = draggingIdSubscriber(newId => {
       setIsDragging(currentIsDragging => {
@@ -134,10 +150,13 @@ export const useDrag: TUseDragProps = ({ element, data, id, canDrag = true, star
     return draggingIdSubscription;
   }, [draggingIdSubscriber, id]);
 
-
   useEffect(() => {
-    const node = element.current; // Captura a referência atual
-    if (!node || !canDrag) return;
+    if (!node) return;
+
+    if (!canDrag) {
+      node.draggable = false;
+      return;
+    }
 
     node.draggable = true;
     node.dataset.draggableId = id;
@@ -153,17 +172,13 @@ export const useDrag: TUseDragProps = ({ element, data, id, canDrag = true, star
         setTimeout(() => removeLayer && removeLayer(currentDragLayer), 0);
       }
 
-      setTimeout(() => {
-        const currentData = latestData.current;
-        setData({ data: currentData, draggingId: id });
-        callbacks.current.start && callbacks.current.start(currentData);
-      }, 0);
+      const currentData = latestData.current;
+      setData({ data: currentData, draggingId: id });
+      callbacks.current.start && callbacks.current.start(currentData);
     };
 
     const handleDragEnd = () => {
-      setTimeout(() => {
-        callbacks.current.end && callbacks.current.end(latestData.current)
-      }, 0);
+      callbacks.current.end && callbacks.current.end(latestData.current);
       clearData();
     };
 
@@ -173,14 +188,29 @@ export const useDrag: TUseDragProps = ({ element, data, id, canDrag = true, star
     return () => {
       node.removeEventListener('dragstart', handleDragStart);
       node.removeEventListener('dragend', handleDragEnd);
+      if (node.draggable) {
+        node.draggable = false;
+      }
+      delete node.dataset.draggableId;
     };
-  }, [element, id, canDrag, setData, clearData]);
-
+  }, [node, id, canDrag, setData, clearData]);
 
   useEffect(() => {
     if (isDragging) updateDataOnly(data);
   }, [isDragging, data, updateDataOnly, ...deps]);
 
+  useEffect(() => {
+    if (registeredDragIds.has(id)) {
+      console.warn(
+        `[react-use-drag-and-drop] Duplicate useDrag id "${id}". ` +
+        `Each draggable element must use a unique id, otherwise multiple sources will report isDragging simultaneously.`
+      );
+    }
+    registeredDragIds.add(id);
+    return () => {
+      registeredDragIds.delete(id);
+    };
+  }, [id]);
 
   const handlePreview: DragResult['preview'] = useCallback((getDragLayer, removeDragLayer, options) => {
     previewConfig.current.getLayer = getDragLayer;
