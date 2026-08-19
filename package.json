@@ -1,9 +1,13 @@
 {
   "name": "react-use-drag-and-drop",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "Allow you drag and drop any html or svg element for react.",
   "license": "MIT",
   "author": "lvsouza",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lvsouza/react-use-drag-and-drop.git"
+  },
   "type": "module",
   "main": "dist/index.cjs.js",
   "module": "dist/index.es.js",
