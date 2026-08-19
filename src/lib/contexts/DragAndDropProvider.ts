@@ -29,9 +29,7 @@ function observe<T>(initialValue: T): IObservable<T> {
       return internalValue;
     },
     set value(newValue: T) {
-      if (internalValue === newValue) return; // Evita disparos desnecessários
       internalValue = newValue;
-      notify();
     }
   };
 }
@@ -96,6 +94,7 @@ export const DragAndDropProvider = ({ children }: IDragAndDropProviderProps) => 
         droppableId: undefined, // Importante: aqui é undefined pois estamos no "limbo"
         draggingId: dragStore.current.draggingId,
       };
+      monitorRef.current.notify();
     };
 
     document.addEventListener('dragover', handleGlobalDragOver);
@@ -117,12 +116,15 @@ export const DragAndDropProvider = ({ children }: IDragAndDropProviderProps) => 
     dragStore.current.data = newData.data;
     dragStore.current.draggingId = newData.draggingId;
     dragStoreId.current.value = newData.draggingId;
+    dragStoreId.current.notify();
   }, []);
 
   const clearData = useCallback(() => {
     monitorRef.current.value = null;
+    monitorRef.current.notify();
     dragStore.current.data = undefined;
     dragStoreId.current.value = undefined;
+    dragStoreId.current.notify();
     dragStore.current.draggingId = undefined;
   }, []);
 
@@ -132,6 +134,7 @@ export const DragAndDropProvider = ({ children }: IDragAndDropProviderProps) => 
 
   const setMonitor = useCallback((monitor: TMonitorState) => {
     monitorRef.current.value = monitor;
+    monitorRef.current.notify();
   }, []);
 
   const updateDataOnly = useCallback((newData: any) => {
